@@ -100,6 +100,9 @@ def create_app(data=None,port=5204):
             response.set_cookie('heron_token',token,httponly=True,samesite='strict')
         return response
 
+    @app.get('/icon.png')
+    def app_icon():return FileResponse(ROOT/'ui/icon.png',media_type='image/png')
+
     @app.get('/icon.svg')
     def icon():return FileResponse(ROOT/'ui/icon.svg',media_type='image/svg+xml')
     return app
