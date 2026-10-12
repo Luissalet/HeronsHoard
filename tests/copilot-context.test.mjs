@@ -158,3 +158,29 @@ test('an existing hoardCopilot is not replaced', async () => {
   vm.runInContext(fs.readFileSync('ui/app.js', 'utf8'), ctx);
   assert.equal(window.hoardCopilot, mine);
 });
+
+test('context() describes the view it started in even if the user opens the history while its fetch is pending', async () => {
+  let hold = false, release = null;
+  const app = boot(base((path, o) => {
+    if (path === '/api/builds' && o && o.method === 'POST') return json(finished('b1'));
+    if (path === '/api/builds') return json({ builds: [] });
+    if (path === '/api/builds/b1') return hold ? new Promise(r => { release = r; }) : json(finished('b1'));
+    return json({}, false);
+  }));
+  await tick();
+  await app.q('build').onclick(); await tick();
+  hold = true;
+  const pending = app.window.hoardCopilot.context();
+  await tick();
+  await app.q('history').onclick(); await tick();
+  release(json({ detail: 'Build not found' }, false));
+  const ctx = plain(await pending);
+  // Started on a build, the fetch failed: the context must not claim the history page that only opened later.
+  assert.equal(ctx.view.page, 'new');
+  assert.deepEqual(ctx.active_objects, []);
+
+  // A later call describes what is open now: the history.
+  hold = false;
+  const again = plain(await app.window.hoardCopilot.context());
+  assert.equal(again.view.page, 'history');
+});

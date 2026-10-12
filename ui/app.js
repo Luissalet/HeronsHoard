@@ -21,10 +21,12 @@ async function refreshInPlace(){
 async function copilotContext(){
   const CC=globalThis.heronCopilotContext;
   try{
+    // Capture the view synchronously: navigating while the fetch is pending must not mix two views.
+    const openMode=mode,openId=openRow?openRow.id:null;
     const {editor,editors}=CC.editorContext(window);
     let row=null;
-    if(mode==='build'&&openRow){try{row=await request('/api/builds/'+encodeURIComponent(openRow.id));}catch(e){row=null;}}
-    return CC.buildContext({row,page:mode,editor,editors});
+    if(openMode==='build'&&openId){try{row=await request('/api/builds/'+encodeURIComponent(openId));}catch(e){row=null;}}
+    return CC.buildContext({row,page:openMode,editor,editors});
   }catch(e){return {active_objects:[],view:{page:'new'}};}
 }
 if(typeof window!=='undefined'&&globalThis.heronCopilotContext&&!window.hoardCopilot){
