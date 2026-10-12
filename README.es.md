@@ -16,12 +16,11 @@ Cada resultado registra tamaño y SHA-256 de sus cinco exportaciones. La descarg
 
 ## Instalación local
 
-Desde esta carpeta, con Python 3.13 en Windows:
+Desde esta carpeta, con Python 3.13 en Windows (la biblioteca compartida Hoard Link va incluida en `heron/hoard_link`):
 
 ```powershell
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -r requirements.txt
-.venv/Scripts/python.exe -m pip install -e ../HoardLink
 .venv/Scripts/python.exe -m heron --no-browser
 ```
 

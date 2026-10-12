@@ -6,12 +6,11 @@ Start with a drilled plate, spacer or L bracket. Every build retains its recipe 
 
 ## Setup
 
-Use Python 3.13 and a dedicated environment, with the sibling HoardLink installed editable:
+Use Python 3.13 and a dedicated environment. The shared Hoard Link library is vendored in `heron/hoard_link`, so nothing else needs installing:
 
 ```powershell
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -r requirements.txt
-.venv/Scripts/python.exe -m pip install -e ../HoardLink
 .venv/Scripts/python.exe -m heron --no-browser
 ```
 
