@@ -48,6 +48,16 @@ Una modificación necesita un identificador nuevo. Tras un fallo de comunicació
 
 Pedir a Faustus una pieza con medidas y consultar `cad_templates` → editar una receta → construir con un identificador estable → revisar vistas e informe → descargar STEP/STL → catalogar el derivado en Vulcan. El Hub incluye este recorrido en `measured-cad`. Ese recorrido es un plan de capacidades; no publica ni ejecuta etapas por sí solo.
 
+## Asistente de Faustus
+
+Con el lanzador compartido de Hoard Link instalado, la app muestra el panel de Faustus de la familia (un botón flotante). La conversación, el modelo y las herramientas viven en Faustus; esta app solo le dice al panel qué hay abierto.
+
+- **Contexto por vista.** Una construcción abierta se envía como `cad_build` con su id real, título de la receta, estado y número de piezas; una terminada añade sólidos, límites en mm, volumen, validez, estanqueidad y los nombres de sus archivos, una fallida un error corto (300 caracteres como máximo). La vista es `new`, `history` o `build`. Una receta nueva o la lista del historial no dan objeto.
+- **Campos sin guardar.** El panel los pide con el evento de ventana `heron:context-request`. El formulario de receta responde como `cad_recipe` solo con los campos de primer nivel que has cambiado; el texto que no es JSON válido se envía como vista previa de 4.000 caracteres como máximo con `invalid_json`.
+- **Refresco.** Cuando el asistente termina un turno, la construcción abierta o el historial se recargan en el sitio (`hoard:copilot-turn-end` / `window.hoardCopilot.onTurnEnd`, unidos en una sola recarga), conservando la vista elegida de la salida.
+- **Guardado.** Las construcciones son recibos inmutables: una receta cambiada pasa a ser una construcción nueva con otro id, así que guardar nunca sobrescribe lo que construyó el asistente. Reutilizar un `request_id` con otra receta se rechaza. Los scripts de la página se sirven en `/app.js` y `/copilot-context.js`.
+- **Pruebas.** `node --test tests/copilot-context.test.mjs` y `python -m pytest tests/test_copilot_ui.py`.
+
 ## Alcance y pruebas
 
 El formato admite hasta 50 primitivas, dimensiones de hasta 2000 mm, posiciones de ±10000 mm y rotaciones de ±360°. Rechaza código, expresiones, rutas arbitrarias, valores no finitos y campos desconocidos. No incorpora todavía un editor de croquis, ensamblajes, importación editable de STEP ni simulación física.

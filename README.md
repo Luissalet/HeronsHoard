@@ -27,6 +27,16 @@ Reuse an ID after communication uncertainty; changed recipes require a new ID. O
 
 Limits: 50 primitives; dimensions up to 2000 mm; translations ±10000 mm; rotations ±360°. No evaluated code, arbitrary paths or unknown fields. Sketch editing, assemblies, editable STEP import and physical simulation are not implemented.
 
+## Faustus assistant
+
+Once the shared Hoard Link launcher is installed, the app shows the family's Faustus panel (a floating button). The conversation, the model and the tools live in Faustus; this app only tells the panel what is open.
+
+- **Context per view.** An open build is sent as kind `cad_build` with its real id, recipe title, state and number of parts; a finished build adds solids, bounds in mm, volume, validity, watertightness and the names of its files, a failed one a short error (300 characters at most). The view is `new`, `history` or `build`. A new recipe or the history list gives no object.
+- **Unsaved fields.** The panel asks for them with the `heron:context-request` window event. The recipe form answers as `cad_recipe` with only the top-level recipe fields you changed; text that is not valid JSON is reported as a preview of at most 4,000 characters with `invalid_json`.
+- **Refresh.** When the assistant finishes a turn the open build or the history reloads in place (`hoard:copilot-turn-end` / `window.hoardCopilot.onTurnEnd`, merged into one reload), keeping the selected view of the output.
+- **Saving.** Builds are immutable receipts: a changed recipe becomes a new build with a new id, so saving never overwrites what the assistant built. Reusing a `request_id` with a different recipe is refused. The page scripts are served at `/app.js` and `/copilot-context.js`.
+- **Tests.** `node --test tests/copilot-context.test.mjs` and `python -m pytest tests/test_copilot_ui.py`.
+
 ## Verification and licence
 
 Install pytest and run `.venv/Scripts/python.exe -m pytest -q tests`. Tests exercise real CAD construction, analytic volumes, STEP round trips, STL meshes, API guards, replay protection and download hashes. A real stdio MCP build and desktop/mobile UI build/download have also been checked.
