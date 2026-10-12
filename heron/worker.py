@@ -1,7 +1,7 @@
 import json
 import sys
 from pathlib import Path
-from hoard_link.atomic import write_text_atomic
+from .hoard_link.atomic import write_text_atomic
 from .geometry import Recipe,export
 
 if __name__=='__main__':

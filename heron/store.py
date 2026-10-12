@@ -5,8 +5,8 @@ import re
 import sqlite3
 import sys
 from pathlib import Path
-from hoard_link.atomic import write_text_atomic
-from hoard_link.proc import run
+from .hoard_link.atomic import write_text_atomic
+from .hoard_link.proc import run
 from .geometry import Recipe
 
 

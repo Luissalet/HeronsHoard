@@ -7,8 +7,9 @@ import uuid
 from pathlib import Path
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
-from hoard_link.atomic import write_text_atomic
-from hoard_link.guard import install_guard
+from .hoard_link.atomic import write_text_atomic
+from .hoard_link.copilot import install_copilot
+from .hoard_link.guard import install_guard
 from .geometry import Recipe,templates
 from .store import Store
 
@@ -22,6 +23,7 @@ def create_app(data=None,port=5204):
     token=token_file.read_text(encoding='utf-8').strip()
     app=FastAPI(title="Heron's Hoard")
     app.state.store=store
+    install_copilot(app,'heron',str(store.directory),app_name="Heron's Hoard")
     install_guard(app,port_getter=lambda:port,allowed_env='HERON_ALLOWED_HOSTS',strict_ports=True)
 
     @app.middleware('http')
