@@ -25,7 +25,7 @@
     return { editor: first, editors: found.length > 1 ? found : undefined };
   }
 
-  // Answer for the recipe form. Invalid JSON is reported as a short text preview, never the whole box.
+  // Answer for the recipe form. An unsaved draft exists only in the editor, so invalid JSON is sent whole (never clipped).
   function recipeSnapshot({ loadedId, loadedRecipe, loadedText, text }) {
     const dirty = text !== loadedText;
     let fields = {};
@@ -33,9 +33,9 @@
       try {
         const draft = JSON.parse(text);
         fields = draft && typeof draft === "object" && !Array.isArray(draft)
-          ? changedFields(loadedRecipe, draft) : { recipe_text: String(text).slice(0, 4000), invalid_json: true };
+          ? changedFields(loadedRecipe, draft) : { recipe_text: String(text), invalid_json: true };
       } catch (e) {
-        fields = { recipe_text: String(text).slice(0, 4000), invalid_json: true };
+        fields = { recipe_text: String(text), invalid_json: true };
       }
     }
     return { kind: "cad_recipe", object_id: loadedId || null, dirty, fields };

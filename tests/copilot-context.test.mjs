@@ -12,7 +12,7 @@ test('changedFields returns only edited top-level fields', () => {
   assert.deepEqual(CC.changedFields(null, { a: 1 }), { a: 1 });
 });
 
-test('recipeSnapshot reports only differences and never dumps invalid text', () => {
+test('recipeSnapshot reports only differences and flags invalid text', () => {
   const recipe = { title: 'Plate', parts: [{ size: [1, 2, 3] }] };
   const text = JSON.stringify(recipe, null, 2);
   const base = { loadedId: 'b1', loadedRecipe: recipe, loadedText: text };
@@ -22,8 +22,22 @@ test('recipeSnapshot reports only differences and never dumps invalid text', () 
   assert.deepEqual(edited.fields, { title: 'Other' });
   const broken = CC.recipeSnapshot({ ...base, text: '{' + 'x'.repeat(9000) });
   assert.equal(broken.fields.invalid_json, true);
-  assert.equal(broken.fields.recipe_text.length, 4000);
+  assert.equal(broken.fields.recipe_text.length, 9001);
   assert.equal(CC.recipeSnapshot({ loadedRecipe: null, loadedText: '', text: '[]' }).object_id, null);
+});
+
+test('recipeSnapshot sends the whole unsaved invalid draft, tail marker included', () => {
+  const marker = 'TAIL_MARKER_END';
+  const base = { loadedId: 'b1', loadedRecipe: { title: 'Plate' }, loadedText: '{"title":"Plate"}' };
+  const broken = '{"title": "x", "notes": "' + 'y'.repeat(6000) + marker;
+  const snap = CC.recipeSnapshot({ ...base, text: broken });
+  assert.equal(snap.fields.invalid_json, true);
+  assert.equal(snap.fields.recipe_text, broken);
+  assert.ok(snap.fields.recipe_text.endsWith(marker));
+  const notObject = '[' + '1,'.repeat(5000) + '"' + marker + '"]';
+  const snap2 = CC.recipeSnapshot({ ...base, text: notObject });
+  assert.equal(snap2.fields.invalid_json, true);
+  assert.equal(snap2.fields.recipe_text, notObject);
 });
 
 test('editorContext picks the first dirty form, lists several, undefined without forms', () => {
