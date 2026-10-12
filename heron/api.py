@@ -100,6 +100,12 @@ def create_app(data=None,port=5204):
             response.set_cookie('heron_token',token,httponly=True,samesite='strict')
         return response
 
+    @app.get('/app.js')
+    def app_script():return FileResponse(ROOT/'ui/app.js',media_type='text/javascript')
+
+    @app.get('/copilot-context.js')
+    def copilot_script():return FileResponse(ROOT/'ui/copilot-context.js',media_type='text/javascript')
+
     @app.get('/icon.png')
     def app_icon():return FileResponse(ROOT/'ui/icon.png',media_type='image/png')
 
